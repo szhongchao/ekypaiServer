@@ -58,22 +58,23 @@ if($dataJson->code =='0') {
 		if($itemArray["groupid"] == $TfpgId){
 			$submit = true;
 			$fileidstr= '';
+            preg_match_all ( '/([a-z]+)([0-9]+)/i', $itemArray["remark"], $fileidstrAarr );
+            for($j = 0; $j < count ( $fileidstrAarr [1] ); $j ++) {
+                for($k=0;$k<strlen($fileidstrAarr[2][$j]);$k++){
+                    if($fileidstrAarr [2] [$j] [$k] !='0'){
+                        $fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$fileidstrAarr [2] [$j] [$k].'|';
+                    }else{
+                        for($z=1;$z<$maxcode;$z++){
+                            $fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$z.'|';
+                        }
+                    }
+                }
+            }
+            $fileidstr= substr($fileidstr,0,strlen($fileidstr)-1);
 			for($j=0;$j<count($itemsrows);$j++){
 				$row=$itemsrows[$j];
 				if($itemArray["uin"] == $row['qqnum']){
-					preg_match_all ( '/([a-z]+)([0-9]+)/i', $itemArray["remark"], $fileidstrAarr );
-					for($j = 0; $j < count ( $fileidstrAarr [1] ); $j ++) {
-						for($k=0;$k<strlen($fileidstrAarr[2][$j]);$k++){
-							if($fileidstrAarr [2] [$j] [$k] !='0'){
-								$fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$fileidstrAarr [2] [$j] [$k].'|';
-							}else{
-								for($z=1;$z<$maxcode;$z++){
-									$fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$z.'|';
-								}
-							}
-						}
-					}
-					$fileidstr= substr($fileidstr,0,strlen($fileidstr)-1);
+					
 					if($fileidstr== $row['fileidstr']){
 						$submit = false;//为第二次购买课程的用户修改权限
 					}
