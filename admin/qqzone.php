@@ -1,7 +1,16 @@
 ﻿<?php
 header('Content-type:text/json;charset=utf-8');
 require_once '../include.php';
- checkAdminLogined();
+ $arrysub =  array();
+ if(@$_SESSION['adminId']==""){
+ 	
+ 	$post_data = array(
+ 			'cid' => '000000',
+ 	);
+ 	$arrysub[] = $post_data;
+ 	die(json_encode($arrysub));
+ }
+ 
  $qqnum=$_POST['qqnum'];
  $p_skey=$_POST['p_skey'];
  $gpname = $_POST['gpname'];
@@ -32,7 +41,6 @@ curl_close($curl);
 $data= substr($data, 10);
 $data= substr($data,0,strlen($data)-3);
 $dataJson=json_decode($data);
-$arrysub =  array();
 if($dataJson->code =='0') {
 	$itemsArray = $dataJson->data->items;
 	$gpnamesArray = $dataJson->data->gpnames;
@@ -109,7 +117,7 @@ if($dataJson->code =='0') {
 	
 }else{
 	$post_data = array(
-			'cid' => '000000',
+			'cid' => '000001',
 	);
 	$arrysub[] = $post_data;
 }
