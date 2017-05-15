@@ -5,7 +5,7 @@ require_once '../include.php';
  if(@$_SESSION['adminId']==""){
  	
  	$post_data = array(
- 			'cid' => '000000',
+ 			'cid' => '登录失败',
  	);
  	$arrysub[] = $post_data;
  	die(json_encode($arrysub));
@@ -117,7 +117,7 @@ if($dataJson->code =='0') {
 	
 }else{
 	$post_data = array(
-			'cid' => '000001',
+			'cid' => 'QQ空间登录失败',
 	);
 	$arrysub[] = $post_data;
 }
