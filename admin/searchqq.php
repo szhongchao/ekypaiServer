@@ -23,7 +23,7 @@ if($act==="getUserInfo"){
 	$qqnum=$_POST['qqnum'];
 	$fileidstr=$_POST['fileidstr'];
 	$openid = $_POST['openid'];
-	$sqls= "update zp_userinfo set fileidstr='{$fileidstr}',qqnum='{$qqnum}',openid='{$openid}' where uid='{$uid}'"; //修改qq和权限
+	$sqls= "update zp_userinfo set fileidstr='{$fileidstr}',qqnum='{$qqnum}',openidmd5='{$openid}' where uid='{$uid}'"; //修改qq和权限
 	$result= mysqli_query($tp,$sqls);
 	$affrows = mysqli_affected_rows($tp);
 	$result= array(
