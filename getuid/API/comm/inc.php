@@ -1,0 +1,2 @@
+<?php die('forbidden'); ?>
+{"appid":"101403674","appkey":"715fc69593431eb981a4a45793f5d689","callback":"http://kypai.gotoip1.com/getuid/getuid.php","scope":"get_user_info","errorReport":true,"storageType":"file","host":"localhost","user":"root","password":"root","database":"test"}

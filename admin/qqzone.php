@@ -2,23 +2,22 @@
 header('Content-type:text/json;charset=utf-8');
 require_once '../include.php';
  $arrysub =  array();
- if(@$_SESSION['adminId']==""){
- 	
+$arryPUser = getPhoneInfo();
+ if($arryPUser['adminId'] == "" || $arryPUser['adminId'] == null ){
  	$post_data = array(
  			'cid' => '登录失败',
  	);
  	$arrysub[] = $post_data;
  	die(json_encode($arrysub));
- }
- 
- $qqnum=$_POST['qqnum'];
- $p_skey=$_POST['p_skey'];
- $gpname = $_POST['gpname'];
+ } 
+$qqnum=$_POST['qqnum'];
+$p_skey=$_POST['p_skey'];
+$gpname = $_POST['gpname'];
  //$g_tk = $_POST['g_tk']; 
  $maxcode = 6;
  set_time_limit(0);//设置超时时间
-/* $qqnum='211342495';
-$p_skey='iH7ti5Tc6362meGcHBtlYrwyQEHSzOYq87zm4J93OBw_';
+ /* $qqnum='211342495';
+$p_skey='pKtdJxQchuryjFjFENoooqqleyTTbxxCknziBqu7GTE_';
 $gpname ='18-TfpgSchool';
 $g_tk ='867583187';   */
 
@@ -59,47 +58,54 @@ if($dataJson->code =='0') {
 	while($itemsrow = mysqli_fetch_array($result)){
 		$itemsrows[]= $itemsrow;
 	}
-	
 	for ($i= 0;$i< count($itemsArray); $i++){
 		$items=json_encode($itemsArray[$i]);
 		$itemArray= json_decode($items,true);
 		if($itemArray["groupid"] == $TfpgId){
-			$submit = true;
-			$fileidstr= '';
-            preg_match_all ( '/([a-z]+)([0-9]+)/i', $itemArray["remark"], $fileidstrAarr );
-            for($j = 0; $j < count ( $fileidstrAarr [1] ); $j ++) {
-                for($k=0;$k<strlen($fileidstrAarr[2][$j]);$k++){
-                    if($fileidstrAarr [2] [$j] [$k] !='0'){
-                        $fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$fileidstrAarr [2] [$j] [$k].'|';
-                    }else{
-                        for($z=1;$z<$maxcode;$z++){
-                            $fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$z.'|';
-                        }
-                    }
-                }
-            }
-            $fileidstr= substr($fileidstr,0,strlen($fileidstr)-1);
+			$pass = true;
+			$fileidstr= conFS($itemArray["remark"],$maxcode);
+			$qqname = base64_encode($itemArray["name"]);
 			for($j=0;$j<count($itemsrows);$j++){
 				$row=$itemsrows[$j];
 				if($itemArray["uin"] == $row['qqnum']){
-					
-					if($fileidstr== $row['fileidstr']){
-						$submit = false;//为第二次购买课程的用户修改权限
+					$model= array();
+					if($itemArray["img"] != $row['figureurl']){ //添加QQzone头像
+						$model['figureurl'] = $itemArray["img"];
 					}
+					if($qqname != $row['qqname']){ //添加QQ姓名
+						
+						$model['qqname'] = $qqname;
+					}
+					if($fileidstr != $row['fileidstr']){
+						$model['fileidstr'] = $fileidstr;
+					}
+					if(count($model) >0){
+						$columns="";
+						foreach($model as $key=>$value){
+							$columns=empty($columns)?
+							sprintf("%s='%s'",$key,$value):
+							sprintf("%s,%s='%s'",$columns,$key,$value);
+						}
+						$sql = sprintf("update zp_userinfo set %s where qqnum={$row['qqnum']}",$columns);
+						$result = mysqli_query($tp,$sql);
+						$post_data = array(
+								'cid' => '1',
+								'pwd'=> '',
+								'drmsts'=> '1',
+								'qqnum' => $itemArray["uin"],
+								'fileidstr'=> $fileidstr,
+								'pcnum'=>'2',
+								'licnumbers'=> '0'
+						);
+						$arrysub[] = $post_data;
+					}
+					$pass = false;
 					break;
 				}
 			}
-			if($submit){
-				$sql="";
-				$sqls= 'select  * from zp_userinfo where qqnum='.$itemArray["uin"];
-				$res= mysqli_query($tp,$sqls);
-				$rs = mysqli_fetch_assoc($res);
-				if($itemArray["uin"]== $rs['qqnum']){
-					$sql="update zp_userinfo set fileidstr='".$fileidstr."' where  qqnum='".$itemArray["uin"]."'";
-				}else{
-					$uid=getCode(15);
-					$sql="insert into zp_userinfo(uid,drmsts,qqnum,fileidstr,pcnum,licnumbers) values($uid,1,'{$itemArray["uin"]}','{$fileidstr}',2,0)";
-				}
+			if($pass){
+				$uid=getCode(15);
+				$sql="insert into zp_userinfo(uid,drmsts,qqnum,fileidstr,pcnum,licnumbers,figureurl,qqname) values({$uid},1,{$itemArray["uin"]},{$fileidstr},2,0,{$itemArray["img"]},{$qqname})";
 				$result = mysqli_query($tp,$sql);
 				$post_data = array(
 						'cid' => '1',
@@ -124,10 +130,26 @@ if($dataJson->code =='0') {
 //返回操作的用户
 echo json_encode($arrysub);
 
+function conFS($remark,$maxcode){
+	$fileidstr ='';
+	preg_match_all ( '/([a-z]+)([0-9]+)/i', $remark, $fileidstrAarr );
+	for($j = 0; $j < count ( $fileidstrAarr [1] ); $j ++) {
+		for($k=0;$k<strlen($fileidstrAarr[2][$j]);$k++){
+			if($fileidstrAarr [2] [$j] [$k] !='0'){
+				$fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$fileidstrAarr [2] [$j] [$k].'|';
+			}else{
+				for($z=1;$z<$maxcode;$z++){
+					$fileidstr = $fileidstr.$fileidstrAarr[1][$j].'0'.$z.'|';
+				}
+			}
+		}
+	}
+	return substr($fileidstr,0,strlen($fileidstr)-1);
+}
+
 function getCode($iCount){
 	$arrChar = strtoupper("0123456789123456789123456789123456789123456789");
 	$k=strlen($arrChar);
-	
 	$strCode = '';
 	For ($i=0; $i<$iCount;$i++)
 	{

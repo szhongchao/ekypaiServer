@@ -2,8 +2,8 @@
 header('Content-type:text/json;charset=utf-8');
 require_once '../include.php';
 $arrysub=[];
-if(@$_SESSION['adminId']==""){
-	
+$arryPUser = getPhoneInfo();
+if($arryPUser['adminId'] == "" || $arryPUser['adminId'] == null ){
 	$result= array(
 			'cid' => '登录失败',
 	);
@@ -22,7 +22,8 @@ if($act==="getUserInfo"){
 	$uid=$_POST['uid'];
 	$qqnum=$_POST['qqnum'];
 	$fileidstr=$_POST['fileidstr'];
-	$sqls= "update zp_userinfo set fileidstr='{$fileidstr}',qqnum='{$qqnum}' where uid='{$uid}'"; //修改qq和权限
+	$openid = $_POST['openid'];
+	$sqls= "update zp_userinfo set fileidstr='{$fileidstr}',qqnum='{$qqnum}',openid='{$openid}' where uid='{$uid}'"; //修改qq和权限
 	$result= mysqli_query($tp,$sqls);
 	$affrows = mysqli_affected_rows($tp);
 	$result= array(

@@ -56,6 +56,16 @@
 			alertMes("请先登陆","login.php");
 		}
 	}
+	/**
+	 * 检测是否有手机登陆.
+	 */
+	function getPhoneInfo(){
+		$result= array(
+				'adminId' => @$_SESSION['adminId'],
+		 // 'adminNickName' =>  $_SESSION['adminNickName'],
+		);
+		return $result;
+	}
 
 	/**
 	 * 注销管理员
