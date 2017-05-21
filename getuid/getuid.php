@@ -100,19 +100,19 @@ var getuidbyQQ = function(){
       var qqnum = $("#qqnum").val();
    	  $.ajax({url:"getuidbyQQ.php?qqnum="+qqnum,
    		 success:function(result){
-   			 var result=JSON.parse(result);
-   			 if(result.cid == "1"){
-   				 $("#showuid").html(showuid);
-   				 $("#qqnum").html("您的购课QQ号是:"+result.qqnum); 
-   				 $("#uid").html("您的课程激活码是:"+result.uid);
-   			 }else if(result.cid == "0"){
-   				 $("#showuid").html(excep);
-   				 $("#qqnum").html("未查到您的购课记录,如果您已购课");
-   				 $("#uid").html("请联系QQ客服211342495处理");
+   			var result=JSON.parse(result);
+   			if(result.cid == "1"){
+   			    $("#showuid").html(showuid);
+   			    $("#qqnum").html("您的购课QQ号是:"+result.qqnum); 
+   			    $("#uid").html("您的课程激活码是:"+result.uid);
+   			}else if(result.cid == "0"){
+   				$("#showuid").html(excep);
+   				$("#qqnum").html("未查到您的购课记录,如果您已购课");
+   				$("#uid").html("请联系QQ客服211342495处理");
    			 }else if(result.cid == "2"){
    				$("#showuid").html(excep);
   				$("#qqnum").html("自助绑定失败,请用您的购课QQ:"+result.qqnum+"联系QQ客服211342495");
-  				$("#uid").html("并把您的自助编码:"+result.openidmd5+"发给QQ客服进行绑定");
+  				$("#uid").html("并把您的自助编码:"+result.openidmd5+":发给QQ客服进行绑定");
    			 }else{
    				$("#showuid").html(excep);
  			    $("#qqnum").html("未知错误");
